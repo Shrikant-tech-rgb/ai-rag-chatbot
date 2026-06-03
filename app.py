@@ -108,7 +108,7 @@ def process_pdf(uploaded_file):
     vectordb = Chroma.from_documents(
         docs,
         get_embeddings(),
-        persist_directory="./chroma_db"
+        persist_directory="/temp/chroma_db"
     )
     retriever = vectordb.as_retriever(
         search_type="mmr",
