@@ -4,7 +4,7 @@ import bcrypt
 import torch
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 
@@ -105,15 +105,13 @@ def process_pdf(uploaded_file):
     documents = loader.load()
     splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=80)
     docs = splitter.split_documents(documents)
-    vectordb = Chroma.from_documents(
-        docs,
-        get_embeddings(),
-        persist_directory="/temp/chroma_db"
-    )
-    retriever = vectordb.as_retriever(
-        search_type="mmr",
-        search_kwargs={"k": 3, "fetch_k": 10}
-    )
+    vectordb = FAISS.from_documents(
+    docs,
+    get_embeddings()
+)
+retriever = vectordb.as_retriever(
+    search_kwargs={"k": 3}
+)
     return retriever, len(docs)
 
 def get_answer(question, retriever):
